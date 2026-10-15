@@ -1,0 +1,11 @@
+.venv/
+__pycache__/
+*.py[cod]
+.pytest_cache/
+Mock_INTERVIEW/.env
+Mock_INTERVIEW/.streamlit/secrets.toml
+DATA/uploads/
+DATA/recordings/
+DATA/mock_buddy.sqlite3*
+Mock_INTERVIEW/DATA/uploads/*
+Mock_INTERVIEW/DATA/recordings/*

@@ -1,0 +1,14 @@
+elevenlabs
+langchain_core
+langchain_openai
+numpy
+pillow
+pymupdf
+pytesseract
+python-docx
+python-dotenv
+pyttsx3
+sounddevice
+soundfile
+speechrecognition
+streamlit
