@@ -267,10 +267,13 @@ st.caption(f"Step {stage_index + 1} of {len(stage_labels)} · " + "  →  ".join
 ))
 
 if st.session_state.stage == "upload":
-    render_voice_player(
-        "Welcome to Mock Buddy. Upload your resume to begin, then type your answers during the interview.",
-        "Play welcome",
-    )
+    if not st.session_state.get("welcome_autoplay_attempted", False):
+        render_voice_player(
+            "Welcome to Mock Buddy. Upload your resume to begin, then type your answers during the interview.",
+            "Play welcome",
+            auto_play=True,
+        )
+        st.session_state.welcome_autoplay_attempted = True
 
 st.sidebar.header("Your practice space")
 st.sidebar.info(

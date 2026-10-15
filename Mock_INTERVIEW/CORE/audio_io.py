@@ -151,16 +151,22 @@ def render_voice_player(
             cursor: pointer;
           }}
           #voice-play:hover {{ border-color: #9eacff; background: rgba(111, 131, 255, .23); }}
+          #voice-play[hidden] {{ display: none; }}
           #voice-status {{ margin-left: 8px; color: #a4b1cc; font-size: 12px; }}
         </style>
         <script>
           const button = document.getElementById("voice-play");
           const status = document.getElementById("voice-status");
           button.textContent = {encoded_label};
+          const autoPlay = {json.dumps(auto_play)};
+          let speechStarted = false;
+          let speechFinished = false;
+          if (autoPlay) button.hidden = true;
           const playVoice = () => {{
             if (!("speechSynthesis" in window) ||
                 !("SpeechSynthesisUtterance" in window)) {{
               status.textContent = "Speech playback is not supported in this browser.";
+              button.hidden = false;
               return false;
             }}
             window.speechSynthesis.cancel();
@@ -168,21 +174,44 @@ def render_voice_player(
             utterance.lang = "en-US";
             const voices = window.speechSynthesis.getVoices();
             utterance.voice = voices.find((voice) => voice.lang === "en-US") || null;
-            utterance.onstart = () => {{ status.textContent = "Speaking…"; }};
-            utterance.onend = () => {{ status.textContent = ""; }};
-            utterance.onerror = () => {{
-              status.textContent = "If you didn't hear it, press the button to replay.";
+            utterance.onstart = () => {{
+              speechStarted = true;
+              button.hidden = true;
+              status.textContent = "Speaking…";
             }};
-            window.speechSynthesis.speak(utterance);
+            utterance.onend = () => {{
+              speechFinished = true;
+              button.hidden = true;
+              status.textContent = "";
+            }};
+            utterance.onerror = () => {{
+              status.textContent = "If you didn't hear it, use the button to replay.";
+              button.hidden = false;
+            }};
+            try {{
+              window.speechSynthesis.speak(utterance);
+            }} catch (error) {{
+              status.textContent = "Speech could not start. Use the button to try again.";
+              button.hidden = false;
+              return false;
+            }}
             return true;
           }};
           button.addEventListener("click", playVoice);
-          if ({json.dumps(auto_play)}) {{
+          if (autoPlay) {{
             window.setTimeout(() => {{
               if (!playVoice()) {{
-                status.textContent = "If you didn't hear it, press the button to replay.";
+                status.textContent = "Use the button to hear the welcome.";
               }}
             }}, 250);
+            window.setTimeout(() => {{
+              if (!speechStarted && !speechFinished &&
+                  !window.speechSynthesis.speaking &&
+                  !window.speechSynthesis.pending) {{
+                button.hidden = false;
+                status.textContent = "Autoplay may be blocked. Use the button to hear the welcome.";
+              }}
+            }}, 2500);
           }}
         </script>
         """,
