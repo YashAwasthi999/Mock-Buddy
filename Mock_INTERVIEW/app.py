@@ -266,10 +266,10 @@ st.caption(f"Step {stage_index + 1} of {len(stage_labels)} · " + "  →  ".join
     for index, label in enumerate(stage_labels)
 ))
 
-if "welcome_spoken" not in st.session_state:
-    st.session_state.welcome_spoken = True
-    speak_in_browser(
-        "Welcome to Mock Buddy. Upload your resume to begin, then type your answers during the interview."
+if st.session_state.stage == "upload":
+    render_voice_player(
+        "Welcome to Mock Buddy. Upload your resume to begin, then type your answers during the interview.",
+        "Play welcome",
     )
 
 st.sidebar.header("Your practice space")
